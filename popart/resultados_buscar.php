@@ -13,56 +13,31 @@
 
 <?php
 
-$buscar = strtolower($_POST['buscar']);
+$conexion = mysqli_connect("localhost", "root", "", "BaseDeDatos");
 
-echo "<h1>Resultados para: <em>$buscar</em></h1>";
+$buscar = $_POST['buscar'];
 
-$resultados = [];
+echo "<h1>Resultados para: <em>" . htmlspecialchars($buscar) . "</em></h1>";
 
+$sql = "SELECT * FROM artistas
+        WHERE nombre LIKE '%$buscar%'";
 
-if (
-    str_contains($buscar, 'warhol') ||
-    str_contains($buscar, 'andy')
-) {
-    $resultados[] = [
-        "titulo" => "Andy Warhol",
-        "link" => "pages/artistas.html"
-    ];
-}
+$resultado = mysqli_query($conexion, $sql);
 
-if (
-    str_contains($buscar, 'lichtenstein') ||
-    str_contains($buscar, 'roy')
-) {
-    $resultados[] = [
-        "titulo" => "Roy Lichtenstein",
-        "link" => "pages/artistas.html"
-    ];
-}
+$cantidad = mysqli_num_rows($resultado);
 
-if (
-    str_contains($buscar, 'richard') ||
-    str_contains($buscar, 'hamilton')
-) {
-    $resultados[] = [
-        "titulo" => "Richard Hamilton",
-        "link" => "pages/artistas.html"
-    ];
-}
+if($cantidad > 0){
 
+    echo "<p>Cantidad de resultados: $cantidad</p>";
 
-if (count($resultados) > 0) {
-
-    echo "<p>Cantidad de resultados: ".count($resultados)."</p>";
-
-    foreach($resultados as $resultado){
+    while($fila = mysqli_fetch_assoc($resultado)){
 
         echo "
         <article style='margin-bottom:20px; padding:20px; border:4px solid black; background:white;'>
 
-            <h2>".$resultado['titulo']."</h2>
+            <h2>".$fila['nombre']."</h2>
 
-            <a href='".$resultado['link']."'>
+            <a href='pages/artistas.html'>
                 Ir a la página
             </a>
 
@@ -70,11 +45,13 @@ if (count($resultados) > 0) {
         ";
     }
 
-} else {
+}else{
 
     echo "<p>No se encontraron resultados.</p>";
 
 }
+
+mysqli_close($conexion);
 
 ?>
 
